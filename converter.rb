@@ -15,7 +15,7 @@ class Converter
 
         @current_question.options.push( body: $1, true: !($2 == '') )
       elsif current_string =~ /^\s*$/
-        result.write "::\n:: #{ @current_question.title } {\n"
+        result.write ":: #{ @current_question.title } {\n"
 
         while @current_question.options != []
           current_option = @current_question.options.shift
