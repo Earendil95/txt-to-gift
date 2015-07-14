@@ -8,7 +8,7 @@ class Converter
         @current_question = Question.new
 
         @current_question.title = $1
-      elsif current_string =~ /.+?\.\s*(.+?)([\+|*]?)$/
+      elsif current_string =~ /.+?\.\s*(.+?)(\+|\*?)$/
         if @current_question.options == nil
           @current_question.options = Array.new
         end
