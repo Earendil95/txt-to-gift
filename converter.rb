@@ -4,18 +4,18 @@ class Converter
   def self.convert(example, result)
     current_string = example.gets
     while !current_string.nil?
-      if current_string =~ /\d+\.\s*(.+?)\:\s*$/
+      if current_string =~ /\d+\.\s*(.+?)\:?\s*$/
         @current_question = Question.new
 
         @current_question.title = $1
       elsif current_string =~ /.+?\.\s*(.+?)(\+|\*?)$/
-        if @current_question.options == nil
-          @current_question.options = Array.new
-        end
-
         @current_question.options.push( body: $1, true: !($2 == '') )
       elsif current_string =~ /^\s*$/
-        result.write ":: #{ @current_question.title } {\n"
+        if @current_question.nil?
+          next
+        end
+
+        result.write "#{ escape_gift_chars @current_question.title } {\n"
 
         while @current_question.options != []
           current_option = @current_question.options.shift
@@ -24,11 +24,13 @@ class Converter
           else
             result.write '~'
           end
-          result.write "#{ current_option[:body] }\n"
+          result.write "#{ escape_gift_chars current_option[:body] }\n"
         end
 
         result.write "}\n\n"
         @current_question = nil
+      elsif current_string =~ /(.+?)\:?$/
+        @current_question.title = @current_question.title + " #{$1}"
       end
 
       current_string = example.gets
@@ -41,4 +43,14 @@ end
 
 class Question
   attr_accessor :title, :options
+
+  def initialize
+    @title = ''
+    @options = []
+  end
+end
+
+def escape_gift_chars(str)
+  pattern = /[#=~\{\}\/\/:\[\]]|\../
+  str.gsub(pattern) { |match| "\\" + match }
 end
