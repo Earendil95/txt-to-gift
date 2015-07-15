@@ -22,7 +22,7 @@ describe Converter do
       input = File.open(input_name, 'r')
       result = File.open(result_name, 'w')
       expected_result = File.open(expected_result_name, 'r')
-      Converter.convert(input, result, '\d+\.', '\d+\)', '(\+?)')
+      Converter.convert(input, result, question_prefix: '^\s*\d+\.', option_prefix: '^\s*\d+\)', option_correct: '(\+?)')
       result.close
       result = File.open(result_name)
       expect(File.read(result_name)).to eq File.read(expected_result_name)

@@ -1,12 +1,10 @@
 require 'rbconfig'
+require 'pry-byebug'
 
 class Converter
   attr_accessor :current_question
 
-  def self.convert(example, result, question_prefix = '\d+\.', option_prefix = '.+?\.', option_correct = '(\+|\*?)')
-    sep = "\r"
-    sep = "\n" if RbConfig::CONFIG['host_os'] =~ /(unix|linux)/
-
+  def self.convert(example, result, sep: "\n", question_prefix: '\d+\.', option_prefix: '.+?\.', option_correct: '(\+|\*?)')
     loop do
       current_string = example.gets(sep)
       @current_question.write(result) if current_string.nil? && !@current_question.nil?
