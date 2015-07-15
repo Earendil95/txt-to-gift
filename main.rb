@@ -13,7 +13,7 @@ else
 end
 
 if !ARGV[2].nil? && !ARGV[3].nil? && !ARGV[4].nil?
-  Converter.convert(example, result, ARGV[2], ARGV[3], ARGV[4])
+  Converter.convert(example, result, question_prefix: ARGV[2], option_prefix: ARGV[3], option_correct: ARGV[4])
 else
   Converter.convert(example, result)
 end

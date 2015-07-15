@@ -5,11 +5,12 @@ class Converter
   attr_accessor :current_question
 
   def self.convert(example, result, sep: "\n", question_prefix: '\d+\.', option_prefix: '.+?\.', option_correct: '(\+|\*?)')
+#    binding.pry 
     loop do
       current_string = example.gets(sep)
       @current_question.write(result) if current_string.nil? && !@current_question.nil?
       break if current_string.nil?
-      current_string.chomp!
+      current_string = current_string.chomp.sub("\xEF\xBB\xBF", "")
 
       question_regexp = Regexp.new question_prefix + '\s*(.+?)\:?\s*$'
       option_regexp = Regexp.new option_prefix + '\s*(.+?)' + option_correct + '\s*$'
