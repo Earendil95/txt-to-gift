@@ -3,43 +3,34 @@ require 'rbconfig'
 class Converter
   attr_accessor :current_question
 
-  def self.convert(example, result)
+  def self.convert(example, result, question_prefix = '\d+\.', option_prefix = '.+?\.', option_correct = '(\+|\*?)')
     sep = "\r"
     sep = "\n" if RbConfig::CONFIG['host_os'] =~ /(unix|linux)/
 
     loop do
       current_string = example.gets(sep)
-      current_string = '' if current_string.nil? && !@current_question.nil?
+      @current_question.write(result) if current_string.nil? && !@current_question.nil?
       break if current_string.nil?
       current_string.chomp!
 
-      if current_string =~ /\d+\.\s*(.+?)\:?\s*$/
+      question_regexp = Regexp.new question_prefix + '\s*(.+?)\:?\s*$'
+      option_regexp = Regexp.new option_prefix + '\s*(.+?)' + option_correct + '\s*$'
+
+      if current_string =~ question_regexp                                                      # new question
+        @current_question.write result unless @current_question.nil?
+
         @current_question = Question.new
 
         @current_question.title = $1
-      elsif current_string =~ /.+?\.\s*(.+?)(\+|\*?)$/
-        @current_question.options.push( body: $1, true: !($2 == '') )
-      elsif current_string =~ /^\s*$/
-        next if @current_question.nil?
-
-        result.write "#{ escape_gift_chars @current_question.title } {\n"
-
-        while @current_question.options != []
-          current_option = @current_question.options.shift
-          if current_option[:true]
-            result.write '='
-          else
-            result.write '~'
-          end
-          result.write "#{ escape_gift_chars current_option[:body] }\n"
-        end
-
-        result.write "}\n\n"
-        @current_question = nil
-      elsif current_string =~ /(.+?)\:?$/
+      elsif current_string =~ option_regexp                                                     # add option
+        @current_question.options.push(body: $1, correct: !($2 == ''))
+      elsif current_string =~ /^\s*$/                                                           # empty line
+        next
+      elsif current_string =~ /\s*(.+?)\:?\s*$/                                                 # multiline question
         @current_question.title = @current_question.title + " #{$1}"
       end
     end
+    @current_question = nil
   end
 end
 
@@ -50,9 +41,25 @@ class Question
     @title = ''
     @options = []
   end
+
+  def write(result)
+    result.write "#{ escape_gift_chars @title } {\n"
+
+    until @options.empty?
+      current_option = @options.shift
+      if current_option[:correct]
+        result.write '='
+      else
+        result.write '~'
+      end
+      result.write "#{ escape_gift_chars current_option[:body] }\n"
+    end
+
+    result.write "}\n\n"
+  end
 end
 
-  def escape_gift_chars(str)
-    pattern = /[#=~\{\}\/\/:\[\]]|\../
-    str.gsub(pattern) { |match| "\\" + match }
-  end
+def escape_gift_chars(str)
+  pattern = /[#=~\{\}\/\/:\[\]]|\../
+  str.gsub(pattern) { |match| '\\' + match }
+end

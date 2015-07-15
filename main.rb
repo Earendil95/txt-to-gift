@@ -1,18 +1,22 @@
-require "./converter.rb"
+require './converter.rb'
 
 if ARGV[0].nil?
-  example = File.open("test_input.txt")
+  example = File.open('test_input.txt')
 else
   example = File.open(ARGV[0])
 end
 
 if ARGV[1].nil?
-  result = File.open("result.txt", "w+")
+  result = File.open('result.txt', 'w')
 else
-  result = File.open(ARGV[1], "w")
+  result = File.open(ARGV[1], 'w')
 end
 
-Converter.convert(example, result)
+if !ARGV[2].nil? && !ARGV[3].nil? && !ARGV[4].nil?
+  Converter.convert(example, result, ARGV[2], ARGV[3], ARGV[4])
+else
+  Converter.convert(example, result)
+end
 
 # input = File.open("test_input.txt")
 # str = input.gets
