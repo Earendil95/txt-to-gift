@@ -1,9 +1,18 @@
+require 'rbconfig'
+
 class Converter
   attr_accessor :current_question
 
   def self.convert(example, result)
-    current_string = example.gets
-    while !current_string.nil?
+    sep = "\r"
+    sep = "\n" if RbConfig::CONFIG['host_os'] =~ /(unix|linux)/
+
+    loop do
+      current_string = example.gets(sep)
+      current_string = '' if current_string.nil? && !@current_question.nil?
+      break if current_string.nil?
+      current_string.chomp!
+
       if current_string =~ /\d+\.\s*(.+?)\:?\s*$/
         @current_question = Question.new
 
@@ -11,10 +20,7 @@ class Converter
       elsif current_string =~ /.+?\.\s*(.+?)(\+|\*?)$/
         @current_question.options.push( body: $1, true: !($2 == '') )
       elsif current_string =~ /^\s*$/
-        if @current_question.nil?
-          current_string = example.gets
-          next
-        end
+        next if @current_question.nil?
 
         result.write "#{ escape_gift_chars @current_question.title } {\n"
 
@@ -33,11 +39,6 @@ class Converter
       elsif current_string =~ /(.+?)\:?$/
         @current_question.title = @current_question.title + " #{$1}"
       end
-
-      current_string = example.gets
-      if current_string.nil? && !@current_question.nil?
-        current_string = ''
-      end
     end
   end
 end
@@ -51,7 +52,7 @@ class Question
   end
 end
 
-def escape_gift_chars(str)
-  pattern = /[#=~\{\}\/\/:\[\]]|\../
-  str.gsub(pattern) { |match| "\\" + match }
-end
+  def escape_gift_chars(str)
+    pattern = /[#=~\{\}\/\/:\[\]]|\../
+    str.gsub(pattern) { |match| "\\" + match }
+  end
