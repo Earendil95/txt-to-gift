@@ -12,6 +12,7 @@ class Converter
         @current_question.options.push( body: $1, true: !($2 == '') )
       elsif current_string =~ /^\s*$/
         if @current_question.nil?
+          current_string = example.gets
           next
         end
 
