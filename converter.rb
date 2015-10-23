@@ -1,6 +1,3 @@
-require 'rbconfig'
-require 'pry-byebug'
-
 class Converter
   attr_accessor :current_question
 

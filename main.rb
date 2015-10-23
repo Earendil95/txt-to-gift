@@ -1,5 +1,7 @@
 require './converter.rb'
 
+puts "#{ ARGV }"
+
 if ARGV[0].nil?
   example = File.open('test_input.txt')
 else
