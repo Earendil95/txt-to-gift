@@ -1,3 +1,6 @@
+TEST INPUT 1
+TESTING SKIPPING FIRST LINES
+
 1. 2~2=4:
 А. проведение УЗИ плода+
 В. исследование крови на Ig М и G на токсоплазму
